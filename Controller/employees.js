@@ -1,5 +1,7 @@
 const path = require("path")             
 const rout = require('express').Router()
+const jwt = require("jsonwebtoken")
+
 // const data = {}
 let data;
 const employees = require('../Data/employees.json')
@@ -7,6 +9,7 @@ const fs = require("fs")
 
 rout.route("/")
     .get((req,res)=>{  
+        
        if(Object.keys(req.query).length!==0){
             req.query.name?data=employees.filter(x=>x.Name===req.query.name):null
             req.query.department?data =employees.filter(x=>x.Department===req.query.department):null
@@ -21,7 +24,7 @@ rout.route("/")
     .post((req,res)=>{
         const idList = employees.map(x=>x.id)
 
-        const id = idList.sort((a,b)=>a-b).reverse()[0] + 1 || 1
+        const id = idList.sort((a,b)=>b-a)[0] + 1 || 1
         const newEmployee = {
             id:id,
             Name:req.query.name,
@@ -31,7 +34,7 @@ rout.route("/")
 
         fs.writeFileSync("./Data/employees.json",JSON.stringify(employees))
         
-        console.log('new employee was successfully added')
+        res.json({success: `new user: ${req.query.name} was added`})
     })
     .put((req,res)=>{
     })
@@ -39,6 +42,6 @@ rout.route("/")
 
     });
 
-rout.route("/:id")    
+rout.route("/:id").get()
 
 module.exports = rout    
